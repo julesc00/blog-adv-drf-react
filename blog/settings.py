@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 from decouple import config
 
@@ -23,15 +23,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
+SITE_NAME = "My Advanced Blog"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1"
+    ]
 
+if not DEBUG:
+    ALLOWED_HOSTS = [
+        "mysite.com",
+        ".mysite.com",
+        "mysite"
+    ]
+
+# RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME")
+# if RENDER_EXTERNAL_HOSTNAME:
+#     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,8 +55,36 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "corsheaders",
+    # "ckeditor",
+    # "ckeditor_uploader",
+]
+
+PROJECT_APPS = []
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
+
+
+#----- CKEditor -----#
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "full",
+        "autoParagraph": False
+    }
+}
+CKEDITOR_UPLOAD_PATH = "/media/"
+
 MIDDLEWARE = [
+    # Add corsheaders middleware
+    "corsheaders.middleware.CorsMiddleware",
+
     'django.middleware.security.SecurityMiddleware',
+
+    # Whitenoise
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,7 +98,10 @@ ROOT_URLCONF = 'blog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            # Set React path to build dir
+            os.path.join(BASE_DIR, "build"),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,13 +120,49 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+#--- DB Configuration ---#
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+if not DEBUG:
+    CORS_ORIGIN_WHITELIST = [
+        "https://mysite.com",
+        "https://admin.mysite.com",
+        "https://blog.mysite.com"
+        "https://mysite",
+    ]
+
+    CSRF_TRUSTED_ORIGINS = [
+        "https://mysite.com",
+        "https://admin.mysite.com",
+        "https://blog.mysite.com"
+        "https://mysite",
+    ]
+
+#--- Password hashers as extra protection for the DB ---#
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -116,9 +198,67 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "build/static")  # Add this once I ran the `npm run build` command.
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 16,
+}
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+)
+
+FILE_UPLOAD_PERMISSIONS = 0o640
+
+EMAIL_BACKEND = "django.core.email.backends.console.EmailBackend"
+
+if not DEBUG:
+    DEFAULT_FROM_EMAIL = "Uridium <mail@uridium.network>"
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = config("EMAIL_HOST")
+    EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+    EMAIL_PORT = config("EMAIL_PORT")
+    EMAIL_USE_TLS = config(bool("EMAIL_USE_TLS"))  # Double check this use of bool setting when required.
+
+
+#--- AWS Settings ---#
+
+# django-ckeditor will not work with S3 bucket through django-stores without this configuration line.
+AWS_QUERYSTRING_AUTH = False
+
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
+
+# AWS S3 settings
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+AWS_DEFAULT_ACL = "public-read"
+
+# Static S3 settings
+STATIC_LOCATION = "static"
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+# S3 public media settings
+PUBLIC_MEDIA_LOCATION = "media"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+DEFAULT_FILE_STORAGE = "core.storage.backends.MediaStore"
