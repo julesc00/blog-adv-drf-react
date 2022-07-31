@@ -239,26 +239,26 @@ if not DEBUG:
     EMAIL_USE_TLS = config(bool("EMAIL_USE_TLS"))  # Double check this use of bool setting when required.
 
 
-#--- AWS Settings ---#
+#--- AWS Settings; Uncomment below section when needed---#
 
 # django-ckeditor will not work with S3 bucket through django-stores without this configuration line.
-AWS_QUERYSTRING_AUTH = False
-
-AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
-
-# AWS S3 settings
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
-AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
-AWS_DEFAULT_ACL = "public-read"
-
-# Static S3 settings
-STATIC_LOCATION = "static"
-STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
-STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-# S3 public media settings
-PUBLIC_MEDIA_LOCATION = "media"
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
-DEFAULT_FILE_STORAGE = "core.storage.backends.MediaStore"
+# AWS_QUERYSTRING_AUTH = False
+#
+# AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+# AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
+# AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
+#
+# # AWS S3 settings
+# AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+# AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+# AWS_DEFAULT_ACL = "public-read"
+#
+# # Static S3 settings
+# STATIC_LOCATION = "static"
+# STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+# STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+#
+# # S3 public media settings
+# PUBLIC_MEDIA_LOCATION = "media"
+# MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+# DEFAULT_FILE_STORAGE = "core.storage.backends.MediaStore"
