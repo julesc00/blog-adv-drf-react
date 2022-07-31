@@ -1,6 +1,7 @@
 # Django, DRF and React Project
+By Solo Python [https://youtu.be/EscHWLV43NQ](https://youtu.be/EscHWLV43NQ).
 
-# Step 1  
+# Steps  
 ---  
 1. Run `npx create-react-app blog-drf-react`  
 2. Move into project directoy -> create Python environment and install dependencies to the latest version.
@@ -16,5 +17,5 @@
    2. Django: `./manage.py runserver` or `python manage.py runserver` this will default to port `8000`
 5. To set up templates in django, run first `npm run build`
 6. Collect static files: `python manage.py collecstatic` or `./manage.py collectstatic` 
-7. 
+7. When pushing changes to repository, remember to include **build** directory which contains the static files.
 
