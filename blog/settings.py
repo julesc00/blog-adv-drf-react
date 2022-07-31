@@ -62,7 +62,10 @@ THIRD_PARTY_APPS = [
     # "ckeditor_uploader",
 ]
 
-PROJECT_APPS = []
+PROJECT_APPS = [
+    "blogapp.apps.BlogappConfig",
+    "category.apps.CategoryConfig",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
