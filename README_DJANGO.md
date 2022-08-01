@@ -18,4 +18,8 @@ By Solo Python [https://youtu.be/EscHWLV43NQ](https://youtu.be/EscHWLV43NQ).
 5. To set up templates in django, run first `npm run build`
 6. Collect static files: `python manage.py collecstatic` or `./manage.py collectstatic` 
 7. When pushing changes to repository, remember to include **build** directory which contains the static files.
+8. Install React-Redux: `npm i axios react-redux react-router-dom redux redux-thunk redux-devtools-extension`
+9. Install the **React Developer Tools** and **Redux Devtools** browser extensions on your browser.
+10. Install TailwindCSS from Framework Guides `npm install -D tailwindcss postcss autoprefixer` then `npx tailwindcss init -p`
+    1. Note: If TailwindCSS `npx tailwindcss init -p` cannot work, copy files from author's repo.
 

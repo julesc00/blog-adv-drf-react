@@ -1,3 +1,35 @@
-from django.shortcuts import render
+from rest_framework import status, permissions
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-# Create your views here.
+from .models import Category
+from .serializers import CategorySerializer
+
+
+class ListCategoriesView(APIView):
+    def get(self, request, format=None):
+        if Category.objects.all().exists():
+            categories = Category.objects.all()
+            result = []
+            for category in categories:
+                if not category.parent:
+                    item = {
+                        "id": category.id,
+                        "name": category.name,
+                        "thumbnail": category.thumbnail.url,
+                        "sub_categories": []
+                    }
+
+                    for cat in categories:
+                        sub_item = {}
+                        if cat.parent and cat.parent.id == category.id:
+                            sub_item["id"] = cat.id
+                            sub_item["name"] = cat.name
+                            sub_item["thumbnail"] = cat.thumbnail.url
+
+                            item["sub_categories"].append(sub_item)
+                    result.append(item)
+            return Response({"categories": "result"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "No categories found."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
