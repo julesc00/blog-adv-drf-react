@@ -33,7 +33,7 @@ class Post(models.Model):
     excerpt = models.CharField(max_length=100)
     # author = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    published = models.DateTimeField(default=timezone.now())
+    published = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=10, choices=options, default="draft")
 
     objects = models.Manager()  # default manager

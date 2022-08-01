@@ -10,6 +10,7 @@ class PostSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
 
     class Meta:
+        model = Post
         fields = (
             "blog_uuid",
             "title",
